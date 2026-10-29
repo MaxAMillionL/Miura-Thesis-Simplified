@@ -1,0 +1,24 @@
+{
+  "gravity_m_s2": [
+    0,
+    0,
+    -9.81
+  ],
+  "timestep": 0.001,
+  "panel_mass_kg": 0.05,
+  "motor_mass_kg": 0.2,
+  "wheel_mass_kg": 0.003,
+  "gear_mass_kg": 0.002,
+  "coupler_mass_kg": 0.0003,
+  "motor_torque_limit_nm": 0.95,
+  "gear_efficiency": 0.8,
+  "hinge_damping": 0.005,
+  "motor_damping": 2e-06,
+  "wheel_friction": 0.9,
+  "ground_friction": 0.9,
+  "body_friction": 0.9,
+  "torsional_friction": 0.002,
+  "rolling_friction": 0.0001,
+  "fixed_base": false,
+  "initial_height_m": 0.2
+}

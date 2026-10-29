@@ -1,0 +1,5 @@
+-- add friction on wheels
+-- fix jumping around
+-- add multiple panels of a robot
+-- add rl
+-- create better mesh implementation
