@@ -8,15 +8,20 @@ import mujoco
 import mujoco.viewer
 
 from simulation_config import load_model
+from module_grid import positive_int
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, add_help=False)
+    parser.add_argument('--help', action='help', help='Show this help message and exit')
+    parser.add_argument('-w', '--width', type=positive_int, default=1, help='Number of module columns (default: 1)')
+    parser.add_argument('-l', '--length', type=positive_int, default=1, help='Number of module rows (default: 1)')
     parser.add_argument("xml", type=Path, nargs="?", default=Path(__file__).with_name("robot.xml"), help="Path to a MuJoCo MJCF XML file")
     parser.add_argument("--config", type=Path, default=Path(__file__).with_name("config.json"), help="Physics configuration (default: config.json beside this script)")
     args = parser.parse_args()
 
-    model = load_model(args.xml, args.config)
+    model = load_model(args.xml, args.config, width=args.width, length=args.length)
+    print(f'{args.width} x {args.length} grid: {args.width * args.length} modules, {model.nu} motor controls')
     data = mujoco.MjData(model)
 
     with mujoco.viewer.launch_passive(model, data) as viewer:

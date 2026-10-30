@@ -78,6 +78,30 @@ def configured_xml(xml_path, config):
         if name == 'floor' or name.endswith(('_tire', '_collision')) or name.startswith('panel_ground_'):
             key = 'ground_friction' if name == 'floor' else ('wheel_friction' if name.endswith('_tire') else 'body_friction')
             geom.set('friction', f"{config[key]} {config['torsional_friction']} {config['rolling_friction']}")
+    # Explicit pairs make wheel_friction the wheel/floor coefficient instead
+    # of allowing the floor's coefficient to override it through geom mixing.
+    # MuJoCo resolves these contacts and transmits their forces through the
+    # wheel joints to the robot; no separate body force should be added.
+    contact = root.find('contact')
+    if contact is None:
+        contact = ET.SubElement(root, 'contact')
+    mu = config['wheel_friction']
+    spin = config['torsional_friction']
+    roll = config['rolling_friction']
+    for tire in root.findall('.//geom'):
+        name = tire.get('name', '')
+        if not name.endswith('_tire'):
+            continue
+        pair = next((p for p in contact.findall('pair')
+                     if {p.get('geom1'), p.get('geom2')} == {'floor', name}), None)
+        if pair is None:
+            pair = ET.SubElement(contact, 'pair', geom1='floor', geom2=name)
+        # Preserve the original four-dimensional contact: normal force,
+        # two sliding friction forces, and spin friction torque.
+        # Use truly frictionless normal-only contacts at zero grip rather
+        # than a friction cone with zero-width axes.
+        pair.set('condim', '1' if mu == 0 else '4')
+        pair.set('friction', f'{mu} {mu} {spin} {roll} {roll}')
     for joint in root.findall('.//body/joint'):
         key = 'hinge_damping' if joint.get('name', '').startswith('fold_') else 'motor_damping'
         joint.set('damping', str(config[key]))
@@ -91,6 +115,8 @@ def configured_xml(xml_path, config):
     return ET.tostring(root, encoding='unicode')
 
 
-def load_model(xml_path, config_path):
+def load_model(xml_path, config_path, *, width=1, length=1):
     import mujoco
-    return mujoco.MjModel.from_xml_string(configured_xml(xml_path, load_config(config_path)))
+    from module_grid import grid_xml
+    xml = configured_xml(xml_path, load_config(config_path))
+    return mujoco.MjModel.from_xml_string(grid_xml(xml, width, length))
