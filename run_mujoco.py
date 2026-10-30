@@ -13,7 +13,7 @@ from module_grid import positive_int
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, add_help=False)
-    parser.add_argument('h', '--help', action='help', help='Show this help message and exit')
+    parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
     parser.add_argument('-w', '--width', type=positive_int, default=1, help='Number of module columns (default: 1)')
     parser.add_argument('-l', '--length', type=positive_int, default=1, help='Number of module rows (default: 1)')
     parser.add_argument("xml", type=Path, nargs="?", default=Path(__file__).with_name("robot.xml"), help="Path to a MuJoCo MJCF XML file")

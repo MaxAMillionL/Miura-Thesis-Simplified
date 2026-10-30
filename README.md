@@ -10,6 +10,12 @@ python run_mujoco.py robot.xml
 python run_mujoco.py --config experiment.json
 ```
 
+To zip the model, use 
+
+```sh
+git ls-files --cached --others --exclude-standard -z | tar czf archive.tar.gz --null -T -
+```
+
 Edit `config.json` and restart the viewer to apply changes. The runner applies
 settings before compiling the model; `robot.xml` and the meshes stay unchanged.
 Launching the XML directly in another viewer bypasses the config.
